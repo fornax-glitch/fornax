@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body {
+    scroll-behavior: smooth;
+  }
+
+  button,
+  input[type="button"],
+  input[type="submit"] {
+    transition: all 0.2s ease;
+  }
+}
