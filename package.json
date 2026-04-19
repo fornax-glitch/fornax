@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.103.3",
     "aos": "^2.3.4",
     "react": "^19.2.4",
     "react-datepicker": "^9.1.0",

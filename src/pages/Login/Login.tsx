@@ -3,48 +3,49 @@ import { useNavigate } from "react-router-dom"
 
 export default function Login() {
 
-const [password,setPassword] = useState("")
-const navigate = useNavigate()
+  const [password, setPassword] = useState("")
+  const navigate = useNavigate()
 
-const handleLogin = () => {
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault() // ✅ VERY IMPORTANT (prevents refresh)
 
-if(password === "Am@JF50869!"){
-localStorage.setItem("admin","true")
-navigate("/admin")
-}else{
-alert("Wrong password")
-}
+    if (password === "Am@JF50869!") {
+      localStorage.setItem("admin", "true")
+      navigate("/admin")
+    } else {
+      alert("Wrong password")
+    }
+  }
 
-}
+  return (
+    <div className="flex items-center justify-center h-screen">
 
-return (
+      <form
+        onSubmit={handleLogin}
+        className="border border-gray-100 p-8 shadow rounded"
+      >
 
-<div className="flex items-center justify-center h-screen">
+        <h2 className="text-2xl font-bold mb-4">
+          Admin Login
+        </h2>
 
-<div className="border border-gray-100 p-8 shadow rounded">
+        <input
+          type="password"
+          placeholder="Password"
+          className="border p-3 w-full mb-4"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-<h2 className="text-2xl font-bold mb-4">
-Admin Login
-</h2>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white p-3 w-full rounded"
+        >
+          Login
+        </button>
 
-<input
-type="password"
-placeholder="Password"
-className="border p-3 w-full mb-4"
-onChange={(e)=>setPassword(e.target.value)}
-/>
+      </form>
 
-<button
-onClick={handleLogin}
-className="bg-blue-600 text-white p-3 w-full rounded"
->
-Login
-</button>
-
-</div>
-
-</div>
-
-)
-
+    </div>
+  )
 }

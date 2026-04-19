@@ -12,15 +12,21 @@ const translations: Record<Language, any> = {
 type ContextType = {
   lang: Language;
   setLang: (lang: Language) => void;
-  t: any; // ✅ VERY IMPORTANT (fixes your error)
+  t: any;
 };
 
 const LanguageContext = createContext<ContextType | null>(null);
 
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-  const [lang, setLang] = useState<Language>(
-    (localStorage.getItem("lang") as Language) || "en"
-  );
+
+  // ✅ DEFAULT = FRENCH (IMPORTANT FOR MOROCCO + SEO)
+  const getInitialLang = (): Language => {
+    const saved = localStorage.getItem("lang") as Language | null;
+    if (saved === "en" || saved === "fr") return saved;
+    return "fr"; // 👈 DEFAULT LANGUAGE
+  };
+
+  const [lang, setLang] = useState<Language>(getInitialLang);
 
   useEffect(() => {
     localStorage.setItem("lang", lang);

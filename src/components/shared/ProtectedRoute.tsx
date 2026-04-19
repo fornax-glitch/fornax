@@ -4,12 +4,12 @@ type Props = {
   children: React.ReactNode;
 };
 
-const isAuthenticated = () => {
-  return !!localStorage.getItem("auth"); // simple for now
+const isAdmin = () => {
+  return localStorage.getItem("admin") === "true";
 };
 
 export default function ProtectedRoute({ children }: Props) {
-  if (!isAuthenticated()) {
+  if (!isAdmin()) {
     return <Navigate to="/login" replace />;
   }
 

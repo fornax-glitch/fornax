@@ -1,10 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import { LanguageProvider } from "../i18n/LanguageContext"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { LanguageProvider } from "../i18n/LanguageContext";
 
-import Home from "../pages/Home/Home"
-import Admin from "../pages/Admin/Admin"
-import Login from "../pages/Login/Login"
-import NotFound from "../pages/NotFound/NotFound"
+import Home from "../pages/Home/Home";
+import Admin from "../pages/Admin/Admin";
+import Login from "../pages/Login/Login";
+import NotFound from "../pages/NotFound/NotFound";
+import ProtectedRoute from "../components/shared/ProtectedRoute";
 
 export default function App() {
   return (
@@ -17,7 +18,15 @@ export default function App() {
 
           {/* Admin */}
           <Route path="/login" element={<Login />} />
-          <Route path="/admin" element={<Admin />} />
+
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
@@ -25,5 +34,5 @@ export default function App() {
         </Routes>
       </Router>
     </LanguageProvider>
-  )
+  );
 }

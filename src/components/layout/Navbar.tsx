@@ -1,116 +1,100 @@
 import { useState, useEffect } from 'react'
 import { useLanguage } from '../../i18n/LanguageContext'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import logoDark from "../../assets/brand/fornax-navbar.png"
 import logoWhite from "../../assets/brand/fornax-white.png"
 
 export default function Navbar() {
-  const { t, lang, setLang } = useLanguage()
+  const { t, setLang } = useLanguage()
   const [scrolled, setScrolled] = useState(false)
-
-  const location = useLocation()
+  const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
 
-  // Detect active route
-  const activePath = location.pathname
-
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-    }
-
+    const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll)
-    handleScroll()
-
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const navItems = [
-    { id: 'fleet', label: t.nav.fleet, path: '/fleet' },
-    { id: 'booking', label: t.nav.booking, path: '/booking' },
-    { id: 'contact', label: t.nav.contact, path: '/contact' }
+    { label: t.nav.fleet, path: '/fleet' },
+    { label: t.nav.booking, path: '/booking' },
+    { label: t.nav.contact, path: '/contact' }
   ]
 
-  const navLinkClass = (path: string) =>
-    'relative transition text-sm font-medium ' +
-    (activePath === path
-      ? scrolled
-        ? 'text-blue-600'
-        : 'text-white'
-      : scrolled
-        ? 'text-gray-800 hover:text-blue-600'
-        : 'text-white hover:text-blue-200'
-    )
+  const whatsapp = "https://wa.me/212642997687"
 
   return (
     <nav
-      className={`sticky top-0 w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? 'border border-gray-100/80 backdrop-blur-md shadow-sm py-3 bg-white/80'
-          : 'bg-black/60 backdrop-blur-md py-3'
+      style={{ position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 9999 }}
+      className={`transition-all duration-300 ${
+        scrolled ? 'bg-white shadow-md' : 'bg-transparent'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center h-24">
 
-        {/* Logo */}
-        <div
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => navigate('/')}
-        >
+        {/* LOGO */}
+        <div onClick={() => navigate('/')} className="cursor-pointer">
           <img
             src={scrolled ? logoDark : logoWhite}
-            alt="FORNAX CAR"
-            className="h-10 md:h-12 w-auto object-contain"
+            alt="Fornax Car Location"
+            className="h-12 object-contain"
           />
         </div>
 
-        {/* Menu */}
+        {/* DESKTOP MENU */}
         <div className="hidden md:flex items-center gap-8">
 
           {navItems.map((item) => (
             <button
-              key={item.id}
+              key={item.path}
               onClick={() => navigate(item.path)}
-              className={navLinkClass(item.path)}
+              className={`text-sm font-semibold transition ${
+                scrolled
+                  ? 'text-gray-800 hover:text-black'
+                  : 'text-white hover:text-gray-200'
+              }`}
             >
               {item.label}
             </button>
           ))}
 
-          {/* Language switch */}
-          <div className={`flex items-center gap-1 rounded-full border ${
-            scrolled
-              ? 'border-gray-200 bg-gray-50/50'
-              : 'border-white/20'
-          } px-2 py-0.5 text-xs`}>
+          {/* PRIMARY CTA */}
+          <a
+            href={whatsapp}
+            target="_blank"
+            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-md transition"
+          >
+            Réserver maintenant
+          </a>
 
-            <button
-              type="button"
-              onClick={() => setLang('fr')}
-              className={`rounded-full px-2 py-0.5 ${
-                lang === 'fr'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-700'
-              }`}
-            >
-              FR
-            </button>
-
-            <span className={scrolled ? 'text-gray-400' : 'text-white/70'}>|</span>
-
-            <button
-              type="button"
-              onClick={() => setLang('en')}
-              className={`rounded-full px-2 py-0.5 ${
-                lang === 'en'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-700'
-              }`}
-            >
-              EN
-            </button>
-
+          {/* LANGUAGE */}
+          <div className={`flex gap-2 text-xs border rounded-full px-3 py-1 font-bold ${
+            scrolled ? 'border-gray-300 text-gray-800' : 'border-white/30 text-white'
+          }`}>
+            <button onClick={() => setLang('fr')} className="hover:opacity-70">FR</button>
+            <span className="opacity-30">|</span>
+            <button onClick={() => setLang('en')} className="hover:opacity-70">EN</button>
           </div>
+
+        </div>
+
+        {/* MOBILE */}
+        <div className="md:hidden flex items-center gap-3">
+
+          <a
+            href={whatsapp}
+            className="bg-green-500 text-white px-3 py-1.5 rounded-full text-sm shadow"
+          >
+            💬
+          </a>
+
+          <button
+            className={`text-3xl ${scrolled || menuOpen ? 'text-gray-900' : 'text-white'}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? '✕' : '☰'}
+          </button>
         </div>
 
       </div>

@@ -1,15 +1,17 @@
-import { type ReactNode } from 'react';
-import Navbar from './Navbar';
-import Footer from './Footer';
-import StickyWhatsAppButton from '../StickyWhatsAppButton';
+import { type ReactNode } from "react";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <>
       <Navbar />
-      <main className="pt-16">{children}</main>
+
+      <main className="m-0 p-0 overflow-x-hidden pt-20">
+        {children}
+      </main>
+
       <Footer />
-      <StickyWhatsAppButton />
     </>
   );
 }
-``

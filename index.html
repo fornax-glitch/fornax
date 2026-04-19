@@ -7,52 +7,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- SEO -->
-    <title>Location de Voiture à Témara | FORNAX Car</title>
+    <title>Location de voiture à Témara dès 250 MAD/jour | FORNAX Car</title>
 
     <meta
       name="description"
-      content="Location de voiture à Témara avec FORNAX Car. Réservez facilement via WhatsApp pour des berlines, SUV et véhicules économiques au Maroc."
+      content="Location de voiture à Témara dès 250 MAD/jour. Réservez en 2 minutes via WhatsApp avec FORNAX Car. Sans caution, livraison gratuite à Rabat et Témara."
     />
 
     <meta
       name="keywords"
-      content="location voiture temara, location voiture maroc, location voiture rabat, FORNAX Car, voiture de location Maroc"
+      content="location voiture temara, location voiture rabat, location voiture maroc, louer voiture temara, FORNAX Car"
     />
 
     <meta name="author" content="FORNAX Car" />
     <meta name="robots" content="index, follow" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://www.fornaxcar.com/" />
 
     <!-- Geo SEO -->
     <meta name="geo.region" content="MA" />
     <meta name="geo.placename" content="Témara" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Location de Voiture à Témara | FORNAX Car" />
+    <meta property="og:title" content="Location de voiture à Témara dès 250 MAD/jour" />
     <meta
       property="og:description"
-      content="Réservez une voiture à Témara avec FORNAX Car. Service rapide, réservation WhatsApp et flotte adaptée au Maroc."
+      content="Réservez votre voiture en 2 minutes via WhatsApp. Sans caution et livraison gratuite à Témara et Rabat."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/fornax-icon.png" />
+    <meta property="og:image" content="/og-image.jpg" />
     <meta property="og:locale" content="fr_FR" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Location de Voiture à Témara | FORNAX Car" />
+    <meta name="twitter:title" content="Location de voiture à Témara | FORNAX Car" />
     <meta
       name="twitter:description"
-      content="Réservez une voiture à Témara avec FORNAX Car. Service rapide, réservation WhatsApp et flotte adaptée au Maroc."
+      content="Réservation rapide via WhatsApp. Sans caution. Livraison gratuite."
     />
-    <meta name="twitter:image" content="/fornax-icon.png" />
+    <meta name="twitter:image" content="/og-image.jpg" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
 
+    <!-- Schema.org (VERY IMPORTANT FOR GOOGLE) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "CarRental",
+        "name": "FORNAX Car",
+        "areaServed": {
+          "@type": "Place",
+          "name": "Témara, Rabat, Maroc"
+        },
+        "url": "https://www.fornaxcar.com/",
+        "telephone": "+212642997687",
+        "priceRange": "250 MAD - 800 MAD",
+        "description": "Location de voiture à Témara avec réservation rapide via WhatsApp, sans caution et livraison gratuite."
+      }
+    </script>
   </head>
 
   <body>
     <div id="root"></div>
+
+    <!-- SMALL SEO CONTENT (VISIBLE TO GOOGLE) -->
+    <noscript>
+      <h1>Location de voiture à Témara</h1>
+      <p>
+        FORNAX Car propose la location de voiture à Témara, Rabat et au Maroc.
+        Réservez facilement via WhatsApp, sans caution, avec livraison gratuite.
+      </p>
+    </noscript>
 
     <script type="module" src="/src/main.tsx"></script>
   </body>

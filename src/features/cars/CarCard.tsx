@@ -1,8 +1,6 @@
-import { useLanguage } from '../../i18n/LanguageContext'
 import type { Car } from '../../types'
 
-export default function CarCard({ car }: { car: Car }) {
-  const { t } = useLanguage()
+export default function CarCard({ car, index = 0 }: { car: Car, index?: number }) {
 
   const carName = `${car.brand} ${car.model}`
 
@@ -16,6 +14,8 @@ export default function CarCard({ car }: { car: Car }) {
     }
   }
 
+  const isBestChoice = index === 1 || car.popular
+
   return (
     <div
       data-aos="zoom-in"
@@ -23,25 +23,32 @@ export default function CarCard({ car }: { car: Car }) {
     >
       {/* IMAGE */}
       <div className="relative overflow-hidden group">
-        
+
+        {/* BEST CHOICE */}
+        {isBestChoice && (
+          <span className="absolute top-3 left-3 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full z-10 shadow">
+            ⭐ Meilleur choix
+          </span>
+        )}
+
         {car.popular && (
           <span className="absolute top-3 right-3 bg-yellow-400 text-yellow-900 text-xs font-semibold px-3 py-1 rounded-full z-10 shadow">
-            {t.car.popular}
+            🔥 Populaire
           </span>
         )}
 
         <img
           src={car.image}
-          alt={carName}
+          alt={`${carName} location voiture Temara Rabat`}
           className="w-full h-52 object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         />
 
-        {/* DARK GRADIENT */}
+        {/* GRADIENT */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
 
-        {/* AVAILABILITY BADGE */}
+        {/* AVAILABILITY */}
         <span className="absolute bottom-3 left-3 text-white text-xs bg-black/70 px-3 py-1 rounded-full backdrop-blur-sm">
-          Disponible aujourd'hui
+          ⚡ Disponible aujourd’hui
         </span>
       </div>
 
@@ -53,9 +60,16 @@ export default function CarCard({ car }: { car: Car }) {
           {carName}
         </h3>
 
+        {/* BENEFIT */}
+        <p className="text-sm text-green-600 font-medium">
+          {car.category === 'Economy' && '💰 Économique – parfait pour petit budget'}
+          {car.category === 'Compact' && '🚗 Confort & facile à conduire'}
+          {car.category === 'SUV' && '🔥 Idéal famille & longs trajets'}
+        </p>
+
         {/* RATING */}
         <div className="text-sm text-gray-500 flex items-center gap-2">
-          ⭐ {car.rating?.toFixed(1) ?? 4.8} • {car.rentals ?? 120} {t.car.rentals}
+          ⭐ {car.rating?.toFixed(1) ?? 4.8} • {car.rentals ?? 120} locations
         </div>
 
         {/* FEATURES */}
@@ -71,14 +85,15 @@ export default function CarCard({ car }: { car: Car }) {
           </span>
         </div>
 
-        {/* PRICE + BUTTON */}
+        {/* PRICE + CTA */}
         <div className="flex items-center justify-between pt-2">
+
           <div>
-            <p className="text-2xl font-bold text-blue-600 leading-none">
+            <p className="text-3xl font-bold text-green-600 leading-none">
               {car.pricePerDay} MAD
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              / {t.car.perDay}
+              par jour
             </p>
           </div>
 
@@ -86,8 +101,9 @@ export default function CarCard({ car }: { car: Car }) {
             onClick={handleSelectCar}
             className="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
           >
-            {t.car.bookNow}
+            Réserver en 30 sec
           </button>
+
         </div>
 
       </div>

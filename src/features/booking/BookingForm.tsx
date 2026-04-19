@@ -5,7 +5,7 @@ import { fleet } from '../cars/fleet'
 import { isAvailable } from '../../utils/availability'
 
 export default function BookingForm() {
-  const { t } = useLanguage()
+  useLanguage()
 
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -13,24 +13,17 @@ export default function BookingForm() {
   const [pickup, setPickup] = useState('')
   const [returnDate, setReturnDate] = useState('')
 
-  // ✅ Load + listen for selected car
   useEffect(() => {
     const updateCar = () => {
       const savedCar = localStorage.getItem("selectedCar")
-      if (savedCar) {
-        setCar(savedCar)
-      }
+      if (savedCar) setCar(savedCar)
     }
 
     updateCar()
     window.addEventListener("carSelected", updateCar)
-
-    return () => {
-      window.removeEventListener("carSelected", updateCar)
-    }
+    return () => window.removeEventListener("carSelected", updateCar)
   }, [])
 
-  // ✅ Price calculation
   const total = useMemo(() => {
     if (!pickup || !returnDate || !car) return 0
 
@@ -50,87 +43,89 @@ export default function BookingForm() {
     return diff > 0 ? diff * selectedCar.pricePerDay : 0
   }, [pickup, returnDate, car])
 
-  // ✅ Booking handler
   const handleBooking = () => {
-    if (!name || !phone || !car || !pickup || !returnDate) {
-      alert("Please fill all fields")
+    if (!car || !pickup || !returnDate) {
+      alert("Veuillez sélectionner une voiture et les dates")
       return
     }
 
-    const message = `Bonjour, je souhaite réserver ${car} à Temara du ${pickup} au ${returnDate}.
+    const message = `Bonjour 👋
 
-Nom: ${name}
-Téléphone: ${phone}
-Total: ${total} MAD`;
+Je souhaite réserver une voiture chez Fornax Car 🇲🇦
+
+🚗 Voiture: ${car}
+📍 Zone: Témara / Rabat / Casablanca
+📅 Du: ${pickup}
+📅 Au: ${returnDate}
+👤 Nom: ${name || "Non renseigné"}
+📱 Téléphone: ${phone || "Non renseigné"}
+💰 Total estimé: ${total} MAD
+
+Merci de me confirmer la disponibilité 🙏`
 
     window.open(generateWhatsAppLink(message))
   }
 
   return (
-    <section
-      id="booking"
-      data-aos="fade-up"
-      className="py-24 bg-white"
-    >
+    <section id="booking" className="py-24 bg-white">
       <div className="max-w-5xl mx-auto px-6">
 
-        {/* HEADER */}
-        <div className="text-center mb-12">
+        {/* TITLE */}
+        <div className="text-center mb-10">
+
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-            {t.booking.title}
+            Réservez votre voiture en 10 secondes 🚗
           </h2>
-          <p className="text-gray-500 mt-3">
-            Réservez votre voiture en quelques secondes
+
+          <p className="text-gray-600 mt-3">
+            Témara • Rabat • Casablanca • Aéroport partout au Maroc
           </p>
+
+          <p className="text-green-600 font-semibold mt-2">
+            ✔ Sans carte bancaire • ✔ Réponse en 5 minutes • ✔ Livraison rapide
+          </p>
+
         </div>
 
-        {/* FORM CARD */}
-        <div
-          data-aos="zoom-in"
-          className="bg-white border border-gray-100 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 grid md:grid-cols-2 gap-6"
-        >
+        {/* FORM */}
+        <div className="bg-white border rounded-2xl shadow-lg p-8 grid md:grid-cols-2 gap-6">
 
-          {/* NAME */}
           <input
             type="text"
-            placeholder={t.booking.name}
-            className="p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            placeholder="Nom complet (optionnel)"
+            className="p-4 border rounded-xl"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
-          {/* PHONE */}
           <input
             type="text"
-            placeholder={t.booking.phone}
-            className="p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            placeholder="Téléphone (optionnel)"
+            className="p-4 border rounded-xl"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
 
-          {/* PICKUP DATE */}
           <input
             type="date"
-            className="p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             value={pickup}
             onChange={(e) => setPickup(e.target.value)}
+            className="p-4 border rounded-xl w-full bg-white text-black"
           />
 
-          {/* RETURN DATE */}
           <input
             type="date"
-            className="p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             value={returnDate}
             onChange={(e) => setReturnDate(e.target.value)}
+            className="p-4 border rounded-xl w-full bg-white text-black"
           />
 
-          {/* CAR SELECT */}
           <select
-            className="p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition md:col-span-2"
+            className="p-4 border rounded-xl md:col-span-2"
             value={car}
             onChange={(e) => setCar(e.target.value)}
           >
-            <option value="">{t.booking.car}</option>
+            <option value="">Choisir une voiture</option>
 
             {fleet.map((carItem) => (
               <option
@@ -138,38 +133,33 @@ Total: ${total} MAD`;
                 value={`${carItem.brand} ${carItem.model}`}
                 disabled={!isAvailable(carItem.id, pickup)}
               >
-                {carItem.brand} {carItem.model}
-                {!isAvailable(carItem.id, pickup) ? ' (Unavailable)' : ''}
+                {carItem.brand} {carItem.model} — {carItem.pricePerDay} MAD/jour
               </option>
             ))}
           </select>
 
-          {/* TOTAL PRICE */}
+          {/* PRICE */}
           {total > 0 && (
-            <div className="md:col-span-2 bg-green-50 border border-green-100 rounded-xl p-4 text-center">
-              <p className="text-sm text-gray-500">
-                {t.booking.totalPrice}
-              </p>
-              <p className="text-2xl font-bold text-green-600">
+            <div className="md:col-span-2 text-center bg-green-50 p-4 rounded-xl">
+              <p className="text-sm text-gray-600">Prix estimé</p>
+              <p className="text-3xl font-bold text-green-600">
                 {total} MAD
               </p>
             </div>
           )}
 
-          {/* BUTTON */}
+          {/* CTA */}
           <button
             onClick={handleBooking}
-            className="md:col-span-2 bg-green-500 hover:bg-green-600 text-white p-4 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+            className="md:col-span-2 bg-green-500 hover:bg-green-600 text-white p-4 rounded-xl font-semibold text-lg shadow-md"
           >
-            <span>📱</span>
-            {t.booking.button}
+            🚗 Réserver instantanément sur WhatsApp
           </button>
 
-          {/* TRUST TEXT */}
-          <div className="md:col-span-2 text-center text-xs text-gray-500 space-y-1">
-            <p>Vos informations sont sécurisées</p>
-            <p>Réponse en moins de 5 minutes</p>
-          </div>
+          {/* TRUST */}
+          <p className="md:col-span-2 text-center text-xs text-gray-500">
+            Aucun paiement en ligne • Annulation gratuite • Support 24/7
+          </p>
 
         </div>
       </div>
