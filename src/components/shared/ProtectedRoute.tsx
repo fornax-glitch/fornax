@@ -11,12 +11,45 @@ export default function ProtectedRoute({ children }: Props) {
   const [allowed, setAllowed] = useState(false)
 
   useEffect(() => {
-    checkUser()
+
+    // 🔥 LISTEN TO AUTH STATE (THIS FIXES YOUR LOOP)
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+
+        if (!session) {
+          setAllowed(false)
+          setLoading(false)
+          return
+        }
+
+        const user = session.user
+
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single()
+
+        if (error) {
+          setAllowed(false)
+        } else {
+          setAllowed(data?.role === "admin")
+        }
+
+        setLoading(false)
+      }
+    )
+
+    // 🔁 ALSO RUN IMMEDIATELY (important)
+    checkSession()
+
+    return () => {
+      listener.subscription.unsubscribe()
+    }
+
   }, [])
 
-  async function checkUser() {
-
-    // ✅ STEP 1 — get session FIRST (important)
+  async function checkSession() {
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) {
@@ -27,7 +60,6 @@ export default function ProtectedRoute({ children }: Props) {
 
     const user = session.user
 
-    // ✅ STEP 2 — check role
     const { data, error } = await supabase
       .from("profiles")
       .select("role")
