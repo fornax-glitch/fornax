@@ -16,22 +16,23 @@ export default function ProtectedRoute({ children }: Props) {
 
   async function checkUser() {
     try {
-      // ✅ WAIT FOR SESSION PROPERLY
+      setLoading(true)
+
+      // ✅ get session safely
       const { data: { session } } = await supabase.auth.getSession()
 
+      // ⚠️ if Supabase is still restoring session
       if (!session) {
         setAllowed(false)
         setLoading(false)
         return
       }
 
-      const user = session.user
-
-      // ✅ CHECK PROFILE ROLE
+      // 👇 get role from profiles
       const { data, error } = await supabase
         .from("profiles")
         .select("role")
-        .eq("id", user.id)
+        .eq("id", session.user.id)
         .single()
 
       if (error || !data) {
@@ -40,15 +41,16 @@ export default function ProtectedRoute({ children }: Props) {
         setAllowed(data.role === "admin")
       }
 
+      setLoading(false)
+
     } catch (err) {
       setAllowed(false)
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
-  // ⛔ WAIT SCREEN (important)
-  if (loading) {
+  // ⏳ loading state (IMPORTANT to avoid redirect loop)
+  if (loading || allowed === null) {
     return (
       <div style={{
         height: "100vh",
@@ -61,11 +63,11 @@ export default function ProtectedRoute({ children }: Props) {
     )
   }
 
-  // ❌ NOT ALLOWED
+  // ❌ not allowed → redirect
   if (!allowed) {
     return <Navigate to="/login" replace />
   }
 
-  // ✅ ALLOWED
+  // ✅ allowed → show admin
   return <>{children}</>
 }
