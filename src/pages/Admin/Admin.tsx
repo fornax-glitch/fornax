@@ -1,24 +1,57 @@
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { supabase } from "../../lib/supabaseClient"
 
-export default function Admin(){
+export default function Admin() {
+  const navigate = useNavigate()
 
-const navigate = useNavigate()
+  useEffect(() => {
+    // 🌙 REMOVE DARK, FORCE LIGHT THEME FOR ADMIN
+    document.body.classList.add("light")
+    document.body.classList.remove("dark")
 
-useEffect(()=>{
+    checkUser()
+  }, [])
 
-const isAdmin = localStorage.getItem("admin")
+  async function checkUser() {
+    const { data: { user } } = await supabase.auth.getUser()
 
-if(!isAdmin){
-navigate("/login")
-}
+    if (!user) {
+      navigate("/login")
+      return
+    }
 
-},[navigate])
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single()
 
-return(
-<div>
-Admin Dashboard
-</div>
-)
+    if (error || data?.role !== "admin") {
+      navigate("/")
+      return
+    }
+  }
 
+  return (
+    <div>
+      {/* YOUR ORIGINAL UI STARTS HERE (kept structure) */}
+
+      <div style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+
+        <h1>Admin Dashboard</h1>
+        <p>You are logged in ✅</p>
+
+        {/* keep your future admin components below */}
+        {/* example: cars table, stats, etc */}
+
+      </div>
+    </div>
+  )
 }

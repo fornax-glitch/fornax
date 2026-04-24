@@ -3,9 +3,6 @@ import { lazy, Suspense } from "react";
 import Layout from "../components/layout/Layout";
 import ProtectedRoute from "../components/shared/ProtectedRoute";
 
-// =====================
-// CORE PAGES
-// =====================
 const Home = lazy(() => import("../pages/Home/Home"));
 const Login = lazy(() => import("../pages/Login/Login"));
 const Admin = lazy(() => import("../pages/Admin/Admin"));
@@ -14,29 +11,19 @@ const Fleet = lazy(() => import("../pages/Fleet/Fleet"));
 const Booking = lazy(() => import("../pages/Booking/Booking"));
 const Contact = lazy(() => import("../pages/Contact/Contact"));
 
-// =====================
-// SEO TEMPLATE PAGES
-// =====================
 const CityPage = lazy(() => import("../pages/seo/CityPage"));
 const AirportPage = lazy(() => import("../pages/seo/AirportPage"));
 
-// =====================
-// SERVICES
-// =====================
 const AirportTransfer = lazy(() => import("../pages/services/AirportTransfer"));
 const AirportDelivery = lazy(() => import("../pages/services/AirportDelivery"));
 const PrivateDriver = lazy(() => import("../pages/services/PrivateDriver"));
 
-// =====================
 const Loader = () => (
   <div className="p-10 text-center text-gray-400">Chargement...</div>
 );
 
 export const router = createBrowserRouter([
 
-  // =====================
-  // CORE
-  // =====================
   {
     path: "/",
     element: (
@@ -47,6 +34,7 @@ export const router = createBrowserRouter([
       </Layout>
     ),
   },
+
   {
     path: "/fleet",
     element: (
@@ -57,6 +45,7 @@ export const router = createBrowserRouter([
       </Layout>
     ),
   },
+
   {
     path: "/booking",
     element: (
@@ -67,6 +56,7 @@ export const router = createBrowserRouter([
       </Layout>
     ),
   },
+
   {
     path: "/contact",
     element: (
@@ -78,9 +68,6 @@ export const router = createBrowserRouter([
     ),
   },
 
-  // =====================
-  // SERVICES
-  // =====================
   {
     path: "/services/airport-transfer",
     element: (
@@ -89,6 +76,7 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
   },
+
   {
     path: "/services/airport-delivery",
     element: (
@@ -97,6 +85,7 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
   },
+
   {
     path: "/services/private-driver",
     element: (
@@ -106,9 +95,6 @@ export const router = createBrowserRouter([
     ),
   },
 
-  // =====================
-  // 🏙️ CITY SEO PAGES
-  // =====================
   {
     path: "/location-voiture/:city",
     element: (
@@ -120,9 +106,6 @@ export const router = createBrowserRouter([
     ),
   },
 
-  // =====================
-  // ✈️ AIRPORT SEO PAGES
-  // =====================
   {
     path: "/location-voiture-aeroport/:airport",
     element: (
@@ -134,9 +117,6 @@ export const router = createBrowserRouter([
     ),
   },
 
-  // =====================
-  // AUTH
-  // =====================
   {
     path: "/login",
     element: (
@@ -145,6 +125,7 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
   },
+
   {
     path: "/admin",
     element: (
@@ -156,9 +137,6 @@ export const router = createBrowserRouter([
     ),
   },
 
-  // =====================
-  // 404
-  // =====================
   {
     path: "*",
     element: (

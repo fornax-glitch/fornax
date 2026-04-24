@@ -8,39 +8,26 @@
     padding: 0;
     height: 100%;
     scroll-behavior: smooth;
-    background: #000;
   }
 
   body {
     overflow-x: hidden;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    transition: background 0.3s ease, color 0.3s ease;
   }
 
-  /* =========================
-     DATE PICKER FIX (MOBILE + DESKTOP)
-  ========================= */
-  input[type="date"] {
-    appearance: auto;
-    -webkit-appearance: auto;
-    background-color: white;
-    color: #111;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    padding: 10px;
-    width: 100%;
+  /* DARK MODE (HOME) */
+  body.dark {
+    background: #0f172a;
+    color: white;
   }
 
-  input[type="date"]::-webkit-datetime-edit {
+  /* LIGHT MODE (ADMIN) */
+  body.light {
+    background: #ffffff;
     color: #111;
   }
 
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0);
-  }
-
-  /* =========================
-     GLOBAL SPACING (PREMIUM LOOK)
-  ========================= */
   section {
     padding-top: 80px;
     padding-bottom: 80px;
@@ -53,9 +40,6 @@
     }
   }
 
-  /* =========================
-     BUTTON CONSISTENCY
-  ========================= */
   button,
   a {
     transition: all 0.2s ease;
@@ -66,9 +50,6 @@
     transform: translateY(-1px);
   }
 
-  /* =========================
-     INPUT IMPROVEMENTS
-  ========================= */
   input,
   select,
   textarea {
@@ -82,31 +63,7 @@
   input:focus,
   select:focus,
   textarea:focus {
-    border-color: #22c55e; /* green-500 */
+    border-color: #22c55e;
     box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
-  }
-
-  /* =========================
-     SCROLLBAR (PREMIUM DETAIL)
-  ========================= */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #111;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #22c55e;
-    border-radius: 10px;
-  }
-
-  /* =========================
-     TEXT SELECTION
-  ========================= */
-  ::selection {
-    background: #22c55e;
-    color: white;
   }
 }
