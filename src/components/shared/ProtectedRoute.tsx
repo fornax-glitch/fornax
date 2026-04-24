@@ -8,76 +8,64 @@ type Props = {
 
 export default function ProtectedRoute({ children }: Props) {
   const [loading, setLoading] = useState(true)
-  const [allowed, setAllowed] = useState(false)
+  const [allowed, setAllowed] = useState<boolean | null>(null)
 
   useEffect(() => {
-
-    // 🔥 LISTEN TO AUTH STATE (THIS FIXES YOUR LOOP)
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-
-        if (!session) {
-          setAllowed(false)
-          setLoading(false)
-          return
-        }
-
-        const user = session.user
-
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .single()
-
-        if (error) {
-          setAllowed(false)
-        } else {
-          setAllowed(data?.role === "admin")
-        }
-
-        setLoading(false)
-      }
-    )
-
-    // 🔁 ALSO RUN IMMEDIATELY (important)
-    checkSession()
-
-    return () => {
-      listener.subscription.unsubscribe()
-    }
-
+    checkUser()
   }, [])
 
-  async function checkSession() {
-    const { data: { session } } = await supabase.auth.getSession()
+  async function checkUser() {
+    try {
+      // ✅ WAIT FOR SESSION PROPERLY
+      const { data: { session } } = await supabase.auth.getSession()
 
-    if (!session) {
+      if (!session) {
+        setAllowed(false)
+        setLoading(false)
+        return
+      }
+
+      const user = session.user
+
+      // ✅ CHECK PROFILE ROLE
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single()
+
+      if (error || !data) {
+        setAllowed(false)
+      } else {
+        setAllowed(data.role === "admin")
+      }
+
+    } catch (err) {
       setAllowed(false)
-      setLoading(false)
-      return
-    }
-
-    const user = session.user
-
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single()
-
-    if (error) {
-      setAllowed(false)
-    } else {
-      setAllowed(data?.role === "admin")
     }
 
     setLoading(false)
   }
 
-  if (loading) return <div>Loading...</div>
+  // ⛔ WAIT SCREEN (important)
+  if (loading) {
+    return (
+      <div style={{
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        Loading...
+      </div>
+    )
+  }
 
-  if (!allowed) return <Navigate to="/login" replace />
+  // ❌ NOT ALLOWED
+  if (!allowed) {
+    return <Navigate to="/login" replace />
+  }
 
+  // ✅ ALLOWED
   return <>{children}</>
 }
