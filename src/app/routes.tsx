@@ -1,29 +1,41 @@
-import { createBrowserRouter } from "react-router-dom";
-import { lazy, Suspense } from "react";
-import Layout from "../components/layout/Layout";
-import ProtectedRoute from "../components/shared/ProtectedRoute";
+import { createBrowserRouter } from "react-router-dom"
+import { lazy, Suspense } from "react"
+import Layout from "../components/layout/Layout"
+import ProtectedRoute from "../components/shared/ProtectedRoute"
 
-const Home = lazy(() => import("../pages/Home/Home"));
-const Login = lazy(() => import("../pages/Login/Login"));
-const Admin = lazy(() => import("../pages/Admin/Admin"));
-const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
-const Fleet = lazy(() => import("../pages/Fleet/Fleet"));
-const Booking = lazy(() => import("../pages/Booking/Booking"));
-const Contact = lazy(() => import("../pages/Contact/Contact"));
+// =====================
+// CORE PAGES
+// =====================
+const Home = lazy(() => import("../pages/Home/Home"))
+const Login = lazy(() => import("../pages/Login/Login"))
+const Admin = lazy(() => import("../pages/Admin/Admin"))
+const NotFound = lazy(() => import("../pages/NotFound/NotFound"))
+const Fleet = lazy(() => import("../pages/Fleet/Fleet"))
+const Booking = lazy(() => import("../pages/Booking/Booking"))
+const Contact = lazy(() => import("../pages/Contact/Contact"))
 
-const CityPage = lazy(() => import("../pages/seo/CityPage"));
-const AirportPage = lazy(() => import("../pages/seo/AirportPage"));
+// =====================
+// SEO PAGES
+// =====================
+const CityPage = lazy(() => import("../pages/seo/CityPage"))
+const AirportPage = lazy(() => import("../pages/seo/AirportPage"))
 
-const AirportTransfer = lazy(() => import("../pages/services/AirportTransfer"));
-const AirportDelivery = lazy(() => import("../pages/services/AirportDelivery"));
-const PrivateDriver = lazy(() => import("../pages/services/PrivateDriver"));
+// =====================
+// SERVICES
+// =====================
+const AirportTransfer = lazy(() => import("../pages/services/AirportTransfer"))
+const AirportDelivery = lazy(() => import("../pages/services/AirportDelivery"))
+const PrivateDriver = lazy(() => import("../pages/services/PrivateDriver"))
 
 const Loader = () => (
   <div className="p-10 text-center text-gray-400">Chargement...</div>
-);
+)
 
 export const router = createBrowserRouter([
 
+  // =====================
+  // HOME
+  // =====================
   {
     path: "/",
     element: (
@@ -68,6 +80,9 @@ export const router = createBrowserRouter([
     ),
   },
 
+  // =====================
+  // SERVICES
+  // =====================
   {
     path: "/services/airport-transfer",
     element: (
@@ -95,6 +110,9 @@ export const router = createBrowserRouter([
     ),
   },
 
+  // =====================
+  // SEO
+  // =====================
   {
     path: "/location-voiture/:city",
     element: (
@@ -117,6 +135,9 @@ export const router = createBrowserRouter([
     ),
   },
 
+  // =====================
+  // AUTH
+  // =====================
   {
     path: "/login",
     element: (
@@ -126,17 +147,23 @@ export const router = createBrowserRouter([
     ),
   },
 
+  // =====================
+  // ADMIN (FIXED ORDER)
+  // =====================
   {
     path: "/admin",
     element: (
-      <ProtectedRoute>
-        <Suspense fallback={<Loader />}>
+      <Suspense fallback={<Loader />}>
+        <ProtectedRoute>
           <Admin />
-        </Suspense>
-      </ProtectedRoute>
+        </ProtectedRoute>
+      </Suspense>
     ),
   },
 
+  // =====================
+  // 404
+  // =====================
   {
     path: "*",
     element: (
@@ -145,4 +172,4 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
   },
-]);
+])

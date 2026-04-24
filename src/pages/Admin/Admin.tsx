@@ -13,7 +13,6 @@ type Car = {
 export default function Admin() {
   const navigate = useNavigate()
 
-  // ================= NEW STATE (CARS) =================
   const [cars, setCars] = useState<Car[]>([])
   const [loadingCars, setLoadingCars] = useState(true)
 
@@ -23,7 +22,6 @@ export default function Admin() {
   const [image, setImage] = useState("")
 
   useEffect(() => {
-    // 🌙 REMOVE DARK, FORCE LIGHT THEME FOR ADMIN
     document.body.classList.add("light")
     document.body.classList.remove("dark")
 
@@ -32,9 +30,9 @@ export default function Admin() {
   }, [])
 
   async function checkUser() {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession()
 
-    if (!user) {
+    if (!session) {
       navigate("/login")
       return
     }
@@ -42,28 +40,30 @@ export default function Admin() {
     const { data, error } = await supabase
       .from("profiles")
       .select("role")
-      .eq("id", user.id)
-      .single()
+      .eq("id", session.user.id)
+      .maybeSingle()   // 🔥 IMPORTANT FIX
 
-    if (error || data?.role !== "admin") {
-      navigate("/")
+    // ⛔ DO NOT redirect instantly on error
+    if (error) {
+      console.log("PROFILE ERROR:", error)
+      return
+    }
+
+    if (data?.role !== "admin") {
+      navigate("/login")
       return
     }
   }
 
-  // ================= NEW FUNCTIONS =================
-
   async function fetchCars() {
     setLoadingCars(true)
 
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("cars")
       .select("*")
       .order("created_at", { ascending: false })
 
-    if (!error && data) {
-      setCars(data)
-    }
+    if (data) setCars(data)
 
     setLoadingCars(false)
   }
@@ -71,7 +71,7 @@ export default function Admin() {
   async function handleAddCar(e: React.FormEvent) {
     e.preventDefault()
 
-    const { error } = await supabase.from("cars").insert([
+    await supabase.from("cars").insert([
       {
         brand,
         model,
@@ -79,11 +79,6 @@ export default function Admin() {
         image
       }
     ])
-
-    if (error) {
-      alert(error.message)
-      return
-    }
 
     setBrand("")
     setModel("")
@@ -97,23 +92,13 @@ export default function Admin() {
     const confirmDelete = confirm("Delete this car?")
     if (!confirmDelete) return
 
-    const { error } = await supabase
-      .from("cars")
-      .delete()
-      .eq("id", id)
-
-    if (error) {
-      alert(error.message)
-      return
-    }
+    await supabase.from("cars").delete().eq("id", id)
 
     fetchCars()
   }
 
   return (
     <div>
-      {/* YOUR ORIGINAL UI STARTS HERE (UNCHANGED) */}
-
       <div style={{
         minHeight: "100vh",
         display: "flex",
@@ -125,10 +110,6 @@ export default function Admin() {
         <h1>Admin Dashboard</h1>
         <p>You are logged in ✅</p>
 
-        {/* keep your future admin components below */}
-
-        {/* ================= NEW SECTION (CARS) ================= */}
-
         <div style={{ marginTop: "40px", width: "100%", maxWidth: "500px" }}>
 
           <h2>Add Car</h2>
@@ -139,61 +120,28 @@ export default function Admin() {
             gap: "10px",
             marginBottom: "30px"
           }}>
-            <input
-              placeholder="Brand"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              required
-            />
 
-            <input
-              placeholder="Model"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              required
-            />
+            <input placeholder="Brand" value={brand} onChange={(e) => setBrand(e.target.value)} required />
+            <input placeholder="Model" value={model} onChange={(e) => setModel(e.target.value)} required />
+            <input type="number" placeholder="Price per day" value={price} onChange={(e) => setPrice(e.target.value)} required />
+            <input placeholder="Image URL" value={image} onChange={(e) => setImage(e.target.value)} required />
 
-            <input
-              type="number"
-              placeholder="Price per day"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required
-            />
+            <button type="submit">Add Car</button>
 
-            <input
-              placeholder="Image URL"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              required
-            />
-
-            <button type="submit">
-              Add Car
-            </button>
           </form>
 
           <h2>Cars</h2>
 
           {loadingCars && <p>Loading...</p>}
 
-          {!loadingCars && cars.length === 0 && (
-            <p>No cars yet</p>
-          )}
-
-          <div style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px"
-          }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {cars.map((car) => (
               <div key={car.id} style={{
                 border: "1px solid #ddd",
                 padding: "10px",
                 borderRadius: "8px",
                 display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center"
+                justifyContent: "space-between"
               }}>
                 <div>
                   <strong>{car.brand} {car.model}</strong>
