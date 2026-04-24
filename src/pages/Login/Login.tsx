@@ -1,7 +1,6 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../../lib/supabaseClient"
-
 
 export default function Login() {
   const [email, setEmail] = useState("")
@@ -9,6 +8,11 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
+
+  useEffect(() => {
+    document.body.classList.add("light")
+    document.body.classList.remove("dark")
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -18,6 +22,8 @@ export default function Login() {
       email,
       password,
     })
+
+    console.log("LOGIN RESULT:", data, error) // 👈 DEBUG
 
     setLoading(false)
 
@@ -45,7 +51,8 @@ export default function Login() {
         width: "300px",
         padding: "20px",
         border: "1px solid #ddd",
-        borderRadius: "10px"
+        borderRadius: "10px",
+        backgroundColor: "#ffffff"
       }}>
         <h2>Login</h2>
 

@@ -15,21 +15,31 @@ export default function ProtectedRoute({ children }: Props) {
   }, [])
 
   async function checkUser() {
-    const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
+    // ✅ STEP 1 — get session FIRST (important)
+    const { data: { session } } = await supabase.auth.getSession()
+
+    if (!session) {
       setAllowed(false)
       setLoading(false)
       return
     }
 
-    const { data } = await supabase
+    const user = session.user
+
+    // ✅ STEP 2 — check role
+    const { data, error } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
       .single()
 
-    setAllowed(data?.role === "admin")
+    if (error) {
+      setAllowed(false)
+    } else {
+      setAllowed(data?.role === "admin")
+    }
+
     setLoading(false)
   }
 
