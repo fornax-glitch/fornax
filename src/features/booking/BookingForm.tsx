@@ -57,8 +57,9 @@ export default function BookingForm() {
         name: name || "Non renseigné",
         phone: phone || "Non renseigné",
         car,
-        date: pickup,
-        status: "pending"
+       pickup_date: pickup,
+       return_date: returnDate,
+       status: "pending"
       }
     ])
 

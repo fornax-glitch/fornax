@@ -15,7 +15,8 @@ type Booking = {
   name: string
   phone: string
   car: string
-  date: string
+  pickup_date: string
+  return_date: string
   status: string
 }
 
@@ -152,8 +153,8 @@ export default function Admin() {
 Votre réservation est confirmée ✅
 
 🚗 Voiture: ${booking.car}
-📅 Date: ${booking.date}
-
+📅 Pickup: ${booking.pickup_date}
+📅 Return: ${booking.return_date}
 Merci pour votre confiance 🙏`
 
     window.open(`https://wa.me/${booking.phone}?text=${encodeURIComponent(message)}`)
@@ -210,7 +211,8 @@ Merci pour votre confiance 🙏`
                 gap: "6px"
               }}>
                 <strong>{b.car}</strong>
-                <span>{b.date}</span>
+                <span>{b.pickup_date}</span>
+                <span>{b.return_date}</span>
                 <span>{b.name}</span>
                 <span>{b.phone}</span>
                 <span>Status: {b.status}</span>
