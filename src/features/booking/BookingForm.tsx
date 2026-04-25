@@ -3,6 +3,7 @@ import { generateWhatsAppLink } from '../../utils/whatsapp'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { fleet } from '../cars/fleet'
 import { isAvailable } from '../../utils/availability'
+import { supabase } from '../../lib/supabaseClient' // ✅ ADDED
 
 export default function BookingForm() {
   useLanguage()
@@ -43,12 +44,30 @@ export default function BookingForm() {
     return diff > 0 ? diff * selectedCar.pricePerDay : 0
   }, [pickup, returnDate, car])
 
-  const handleBooking = () => {
+  // ✅ UPDATED FUNCTION (CORE CHANGE)
+  const handleBooking = async () => {
     if (!car || !pickup || !returnDate) {
       alert("Veuillez sélectionner une voiture et les dates")
       return
     }
 
+    // ================= SAVE TO SUPABASE =================
+    const { error } = await supabase.from("bookings").insert([
+      {
+        name: name || "Non renseigné",
+        phone: phone || "Non renseigné",
+        car,
+        date: pickup,
+        status: "pending"
+      }
+    ])
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    // ================= WHATSAPP (UNCHANGED) =================
     const message = `Bonjour 👋
 
 Je souhaite réserver une voiture chez Fornax Car 🇲🇦
@@ -64,6 +83,12 @@ Je souhaite réserver une voiture chez Fornax Car 🇲🇦
 Merci de me confirmer la disponibilité 🙏`
 
     window.open(generateWhatsAppLink(message))
+
+    // OPTIONAL RESET (SAFE)
+    setName('')
+    setPhone('')
+    setPickup('')
+    setReturnDate('')
   }
 
   return (

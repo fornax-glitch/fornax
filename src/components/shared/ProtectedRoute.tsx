@@ -19,9 +19,13 @@ export default function ProtectedRoute({ children }: any) {
       return
     }
 
-    // 🔥 TEMP FIX: assume authenticated = admin (until DB fixed)
-    // This removes your crash completely
-    setAllowed(true)
+    const { data } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", session.user.id)
+      .single()
+
+    setAllowed(data?.role === "admin")
     setLoading(false)
   }
 
