@@ -12,11 +12,13 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.103.3",
     "aos": "^2.3.4",
+    "framer-motion": "^12.38.0",
     "react": "^19.2.4",
     "react-datepicker": "^9.1.0",
     "react-dom": "^19.2.4",
     "react-helmet-async": "^3.0.0",
-    "react-router-dom": "^6.30.3"
+    "react-router-dom": "^6.30.3",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

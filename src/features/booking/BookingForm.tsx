@@ -1,191 +1,125 @@
-import { useState, useMemo, useEffect } from 'react'
-import { generateWhatsAppLink } from '../../utils/whatsapp'
-import { useLanguage } from '../../i18n/LanguageContext'
-import { fleet } from '../cars/fleet'
-import { isAvailable } from '../../utils/availability'
-import { supabase } from '../../lib/supabaseClient' // ✅ ADDED
+import { useState, useMemo, useEffect } from "react"
+import { generateWhatsAppLink } from "../../utils/whatsapp"
+import { fleet } from "../cars/fleet"
+import { supabase } from "../../lib/supabaseClient"
 
 export default function BookingForm() {
-  useLanguage()
-
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [car, setCar] = useState('')
-  const [pickup, setPickup] = useState('')
-  const [returnDate, setReturnDate] = useState('')
+  const [name, setName] = useState("")
+  const [phone, setPhone] = useState("")
+  const [car, setCar] = useState("")
+  const [pickup, setPickup] = useState("")
+  const [returnDate, setReturnDate] = useState("")
 
   useEffect(() => {
-    const updateCar = () => {
-      const savedCar = localStorage.getItem("selectedCar")
-      if (savedCar) setCar(savedCar)
-    }
-
-    updateCar()
-    window.addEventListener("carSelected", updateCar)
-    return () => window.removeEventListener("carSelected", updateCar)
+    const saved = localStorage.getItem("selectedCar")
+    if (saved) setCar(saved)
   }, [])
 
-  const total = useMemo(() => {
-    if (!pickup || !returnDate || !car) return 0
+  // ================= PRICE + DAYS =================
+  const { total, days } = useMemo(() => {
+    if (!pickup || !returnDate || !car) return { total: 0, days: 0 }
 
-    const selectedCar = fleet.find(
+    const selected = fleet.find(
       (c) => `${c.brand} ${c.model}` === car
     )
 
-    if (!selectedCar) return 0
+    if (!selected) return { total: 0, days: 0 }
 
-    const start = new Date(pickup)
-    const end = new Date(returnDate)
+    const start = new Date(pickup).getTime()
+    const end = new Date(returnDate).getTime()
 
-    const diff =
-      (end.getTime() - start.getTime()) /
-      (1000 * 60 * 60 * 24)
+    const diffDays = (end - start) / (1000 * 60 * 60 * 24)
 
-    return diff > 0 ? diff * selectedCar.pricePerDay : 0
+    if (diffDays <= 0) return { total: 0, days: 0 }
+
+    return {
+      days: diffDays,
+      total: diffDays * selected.pricePerDay
+    }
   }, [pickup, returnDate, car])
 
-  // ✅ UPDATED FUNCTION (CORE CHANGE)
+  // ================= FINAL BOOKING =================
   const handleBooking = async () => {
     if (!car || !pickup || !returnDate) {
-      alert("Veuillez sélectionner une voiture et les dates")
+      alert("Please fill all fields")
       return
     }
 
-    // ================= SAVE TO SUPABASE =================
+    // ❗ NO manual conflict check (DB trigger handles it)
+
     const { error } = await supabase.from("bookings").insert([
       {
-        name: name || "Non renseigné",
-        phone: phone || "Non renseigné",
+        name: name || "N/A",
+        phone: phone || "N/A",
         car,
-       pickup_date: pickup,
-       return_date: returnDate,
-       status: "pending"
+        pickup_date: pickup,
+        return_date: returnDate,
+        total_price: total,
+        days: Math.round(days),
+        status: "pending"
       }
     ])
 
     if (error) {
-      alert(error.message)
+      alert(error.message) // will show trigger conflict message too
       return
     }
 
-    // ================= WHATSAPP (UNCHANGED) =================
-    const message = `Bonjour 👋
+    window.open(
+      generateWhatsAppLink(`Booking confirmed 🚗
 
-Je souhaite réserver une voiture chez Fornax Car 🇲🇦
+Car: ${car}
+From: ${pickup}
+To: ${returnDate}
+Days: ${Math.round(days)}
+Total: ${total} MAD`)
+    )
 
-🚗 Voiture: ${car}
-📍 Zone: Témara / Rabat / Casablanca
-📅 Du: ${pickup}
-📅 Au: ${returnDate}
-👤 Nom: ${name || "Non renseigné"}
-📱 Téléphone: ${phone || "Non renseigné"}
-💰 Total estimé: ${total} MAD
-
-Merci de me confirmer la disponibilité 🙏`
-
-    window.open(generateWhatsAppLink(message))
-
-    // OPTIONAL RESET (SAFE)
-    setName('')
-    setPhone('')
-    setPickup('')
-    setReturnDate('')
+    setName("")
+    setPhone("")
+    setPickup("")
+    setReturnDate("")
   }
 
   return (
-    <section id="booking" className="py-24 bg-white">
+    <section className="py-24 bg-white">
       <div className="max-w-5xl mx-auto px-6">
 
-        {/* TITLE */}
-        <div className="text-center mb-10">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          Book Your Car 🚗
+        </h2>
 
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-            Réservez votre voiture en 10 secondes 🚗
-          </h2>
+        <div className="grid md:grid-cols-2 gap-6">
 
-          <p className="text-gray-600 mt-3">
-            Témara • Rabat • Casablanca • Aéroport partout au Maroc
-          </p>
+          <input value={name} onChange={e => setName(e.target.value)} placeholder="Name" className="p-4 border rounded" />
+          <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Phone" className="p-4 border rounded" />
 
-          <p className="text-green-600 font-semibold mt-2">
-            ✔ Sans carte bancaire • ✔ Réponse en 5 minutes • ✔ Livraison rapide
-          </p>
+          <input type="date" value={pickup} onChange={e => setPickup(e.target.value)} className="p-4 border rounded" />
+          <input type="date" value={returnDate} onChange={e => setReturnDate(e.target.value)} className="p-4 border rounded" />
 
-        </div>
-
-        {/* FORM */}
-        <div className="bg-white border rounded-2xl shadow-lg p-8 grid md:grid-cols-2 gap-6">
-
-          <input
-            type="text"
-            placeholder="Nom complet (optionnel)"
-            className="p-4 border rounded-xl"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-
-          <input
-            type="text"
-            placeholder="Téléphone (optionnel)"
-            className="p-4 border rounded-xl"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-
-          <input
-            type="date"
-            value={pickup}
-            onChange={(e) => setPickup(e.target.value)}
-            className="p-4 border rounded-xl w-full bg-white text-black"
-          />
-
-          <input
-            type="date"
-            value={returnDate}
-            onChange={(e) => setReturnDate(e.target.value)}
-            className="p-4 border rounded-xl w-full bg-white text-black"
-          />
-
-          <select
-            className="p-4 border rounded-xl md:col-span-2"
-            value={car}
-            onChange={(e) => setCar(e.target.value)}
-          >
-            <option value="">Choisir une voiture</option>
-
-            {fleet.map((carItem) => (
-              <option
-                key={carItem.id}
-                value={`${carItem.brand} ${carItem.model}`}
-                disabled={!isAvailable(carItem.id, pickup)}
-              >
-                {carItem.brand} {carItem.model} — {carItem.pricePerDay} MAD/jour
+          <select className="p-4 border rounded md:col-span-2" value={car} onChange={e => setCar(e.target.value)}>
+            <option value="">Select Car</option>
+            {fleet.map(c => (
+              <option key={c.id} value={`${c.brand} ${c.model}`}>
+                {c.brand} {c.model} - {c.pricePerDay} MAD
               </option>
             ))}
           </select>
 
-          {/* PRICE */}
           {total > 0 && (
-            <div className="md:col-span-2 text-center bg-green-50 p-4 rounded-xl">
-              <p className="text-sm text-gray-600">Prix estimé</p>
-              <p className="text-3xl font-bold text-green-600">
-                {total} MAD
-              </p>
+            <div className="md:col-span-2 text-center bg-green-50 p-4 rounded">
+              <h3 className="text-2xl font-bold">
+                {total} MAD ({Math.round(days)} days)
+              </h3>
             </div>
           )}
 
-          {/* CTA */}
           <button
             onClick={handleBooking}
-            className="md:col-span-2 bg-green-500 hover:bg-green-600 text-white p-4 rounded-xl font-semibold text-lg shadow-md"
+            className="md:col-span-2 bg-green-500 text-white p-4 rounded"
           >
-            🚗 Réserver instantanément sur WhatsApp
+            Reserve Now
           </button>
-
-          {/* TRUST */}
-          <p className="md:col-span-2 text-center text-xs text-gray-500">
-            Aucun paiement en ligne • Annulation gratuite • Support 24/7
-          </p>
 
         </div>
       </div>
