@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { supabase } from "../../lib/supabaseClient"
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
-  BarChart, Bar, ResponsiveContainer, Legend
+  BarChart, Bar, ResponsiveContainer
 } from "recharts"
 
 /* ─────────────────────────────────────────
@@ -127,7 +127,6 @@ export default function Admin() {
   const [expenses, setExpenses]       = useState<Expense[]>([])
   const [page, setPage]               = useState<Page>("dashboard")
   const [dark, setDark]               = useState(localStorage.getItem("dark") === "true")
-  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   /* Fleet form */
   const [brand, setBrand]     = useState("")
@@ -800,9 +799,9 @@ export default function Admin() {
                       <XAxis dataKey="date" tick={{ fontSize: 10, fill: T.textMuted }} />
                       <YAxis tick={{ fontSize: 10, fill: T.textMuted }} />
                       <Tooltip
-                        contentStyle={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text, fontSize: 12 }}
-                        formatter={(v: number) => [`${v.toLocaleString()} MAD`, "Revenu"]}
-                      />
+    contentStyle={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text, fontSize: 12 }}
+    formatter={(v: any) => [`${Number(v).toLocaleString()} MAD`, "Revenu"]}
+  />
                       <Line type="monotone" dataKey="revenue" stroke={T.gold} strokeWidth={2} dot={{ fill: T.gold, r: 3 }} />
                     </LineChart>
                   </ResponsiveContainer>
@@ -816,9 +815,9 @@ export default function Admin() {
                       <XAxis dataKey="date" tick={{ fontSize: 10, fill: T.textMuted }} />
                       <YAxis tick={{ fontSize: 10, fill: T.textMuted }} allowDecimals={false} />
                       <Tooltip
-                        contentStyle={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text, fontSize: 12 }}
-                        formatter={(v: number) => [v, "Réservations"]}
-                      />
+    contentStyle={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text, fontSize: 12 }}
+    formatter={(v: any) => [v, "Réservations"]}
+  />
                       <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -960,7 +959,6 @@ function KPICard({ label, value, sub, accent, T }: {
 }
 
 function StatusBadge({ status, overdue }: { status: Booking["status"] | "available"; overdue: boolean; T?: typeof DARK }) {
-  const DARK_MODE = document.documentElement.getAttribute("data-theme") === "dark"
   if (overdue) return (
     <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: "#1a0a0a", color: "#f87171", border: "1px solid #7f1d1d" }}>
       En retard
